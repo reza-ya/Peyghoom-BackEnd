@@ -1,0 +1,6 @@
+@Peyghoom_BackEnd_HostAddress = http://localhost:5148
+
+GET {{Peyghoom_BackEnd_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

@@ -1,7 +1,12 @@
-﻿using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Http.HttpResults;
+﻿using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
+using Peyghoom_BackEnd.Constants;
+using Peyghoom_BackEnd.Contracts.types;
+using Peyghoom_BackEnd.Contracts.types.VerificationCode;
+using Peyghoom_BackEnd.Options;
 using Peyghoom_BackEnd.Services;
+using System.Net;
+using System.Security.Claims;
 
 namespace Peyghoom_BackEnd.Endpoints
 {
@@ -11,22 +16,49 @@ namespace Peyghoom_BackEnd.Endpoints
         {
             var group = app.MapGroup(prefix);
 
-            group.MapGet("/login", LoginAsync);
-            group.MapGet("/register", Register);
+            group.MapPost("/verification-code", VerificationCode);
+
+            group.MapPost("/verify", Verify)
+                    .RequireAuthorization(AuthorizationPolicy.VerifyPolicy);
 
             return app;
         }
 
 
-        public static async Task<IResult> LoginAsync([FromServices]IAuthService authService)
+        public static IResult VerificationCode([FromBody] VerificationCodeRequest verificationCodeRequest, 
+                                                                    [FromServices] IOTPService oTPService,
+                                                                    [FromServices] IAuthService authService)
         {
-            await authService.GenerateTokenAsync(new Services.Types.GenerateTokenRequest());
-            return Results.Ok(new { Message = "Not Implemented" });
+            oTPService.SendCode(verificationCodeRequest.PhoneNumber, verificationCodeRequest.CountryCode);
+
+            var token = authService.GenerateToken(new List<Claim>() { new Claim(ClaimKey.PhoneNumber, verificationCodeRequest.PhoneNumber.ToString())}, VerifyAuthSchemaOptions.VerifyAuthSchema);
+
+            return Results.Ok(new { token });
         }
 
-        public static IResult Register()
+
+        public static IResult Verify([FromBody] VerifyRequest verifyRequest,
+                                            [FromServices] IOTPService oTPService,
+                                            HttpContext httpContext)
         {
-            return Results.Ok(new { Message = "Not Implemented" });
+            long.TryParse(httpContext.User.FindFirst(ClaimKey.PhoneNumber)?.Value, out long phoneNumber);
+
+            if (phoneNumber == 0)
+            {
+                // TODO: log and throw exception
+                throw new Exception();
+            }
+
+            var result = oTPService.VerifyCode(phoneNumber, verifyRequest.Code);
+
+            if (result.IsSuccess)
+            {
+                return Results.Ok();
+            }
+            else
+            {
+                return Results.StatusCode((int)HttpStatusCode.Gone);
+            }
         }
     }
 }

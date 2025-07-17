@@ -11,9 +11,6 @@ namespace Peyghoom_BackEnd
 
             builder.AddConfigurations();
 
-            // Add services to the container.
-            builder.Services.AddAuthorization();
-
             // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
             builder.Services.AddOpenApi();
 
@@ -27,6 +24,7 @@ namespace Peyghoom_BackEnd
 
             app.UseHttpsRedirection();
 
+            app.UseAuthentication();
             app.UseAuthorization();
 
 

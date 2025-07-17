@@ -1,9 +1,12 @@
 ﻿using Peyghoom_BackEnd.Services.Types;
+using System.Security.Claims;
 
 namespace Peyghoom_BackEnd.Services
 {
     public interface IAuthService
     {
-        Task<GenerateTokenResponse> GenerateTokenAsync(GenerateTokenRequest generateTokenRequest);
+        string GenerateToken(List<Claim> claims, string authenticationSchema);
+
+        Task GetVerifyJwtAndGetClaimsAsync(string token);
     }
 }

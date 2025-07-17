@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.IdentityModel.Tokens;
+using Peyghoom_BackEnd.Infrastructures;
+using Peyghoom_BackEnd.Infrastructures.Repositories;
 using Peyghoom_BackEnd.Options;
 using Peyghoom_BackEnd.Services;
 using System.Text;
@@ -13,6 +15,7 @@ namespace Peyghoom_BackEnd
             builder.AddServices();
             builder.AddAuthenticationAndAuthentication();
             builder.AddOptions();
+            builder.Services.AddSignalR();
             return builder;
         }
 
@@ -22,7 +25,8 @@ namespace Peyghoom_BackEnd
         {
             builder.Services.AddScoped<IAuthService, AuthService>();
             builder.Services.AddSingleton<IOTPService, OTPService>();
-
+            builder.Services.AddScoped<IPeyghoomContext, PeyghoomContext>();
+            builder.Services.AddScoped<IUserRepository, UserRepository>();
 
             builder.Services.AddMemoryCache();
             return builder;
@@ -87,6 +91,7 @@ namespace Peyghoom_BackEnd
         {
             builder.Services.Configure<VerifyAuthSchemaOptions>(builder.Configuration.GetSection(VerifyAuthSchemaOptions.VerifyAuthSchema));
             builder.Services.Configure<MainAuthSchemaOptions>(builder.Configuration.GetSection(MainAuthSchemaOptions.MainAuthSchema));
+            builder.Services.Configure<PeyghoomContextOptions>(builder.Configuration.GetSection(PeyghoomContextOptions.PeyghoomContext));
             return builder;
         }
     }

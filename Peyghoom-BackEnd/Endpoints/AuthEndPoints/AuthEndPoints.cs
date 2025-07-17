@@ -22,7 +22,7 @@ namespace Peyghoom_BackEnd.Endpoints
                     .RequireAuthorization(AuthorizationPolicy.VerifyPolicy);
 
             return app;
-        }
+        }   
 
 
         public static IResult VerificationCode([FromBody] VerificationCodeRequest verificationCodeRequest, 
@@ -31,7 +31,7 @@ namespace Peyghoom_BackEnd.Endpoints
         {
             oTPService.SendCode(verificationCodeRequest.PhoneNumber, verificationCodeRequest.CountryCode);
 
-            var token = authService.GenerateToken(new List<Claim>() { new Claim(ClaimKey.PhoneNumber, verificationCodeRequest.PhoneNumber.ToString())}, VerifyAuthSchemaOptions.VerifyAuthSchema);
+            var token = authService.GenerateToken(new List<Claim>() { new Claim(ClaimKey.PhoneNumber, verificationCodeRequest.PhoneNumber.ToString())}, DateTime.UtcNow.AddMinutes(3), VerifyAuthSchemaOptions.VerifyAuthSchema);
 
             return Results.Ok(new { token });
         }
@@ -39,6 +39,7 @@ namespace Peyghoom_BackEnd.Endpoints
 
         public static IResult Verify([FromBody] VerifyRequest verifyRequest,
                                             [FromServices] IOTPService oTPService,
+                                            [FromServices] IAuthService authService,
                                             HttpContext httpContext)
         {
             long.TryParse(httpContext.User.FindFirst(ClaimKey.PhoneNumber)?.Value, out long phoneNumber);
@@ -51,14 +52,16 @@ namespace Peyghoom_BackEnd.Endpoints
 
             var result = oTPService.VerifyCode(phoneNumber, verifyRequest.Code);
 
-            if (result.IsSuccess)
-            {
-                return Results.Ok();
-            }
-            else
+            
+            if (result.IsFailure)
             {
                 return Results.StatusCode((int)HttpStatusCode.Gone);
             }
+
+
+            var token = authService.GenerateToken(new List<Claim>() { }, DateTime.UtcNow.AddHours(12), MainAuthSchemaOptions.MainAuthSchema);
+
+            return Results.Ok(new { token });
         }
     }
 }

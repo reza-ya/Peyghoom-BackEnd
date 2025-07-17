@@ -1,9 +1,7 @@
 ﻿
-using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Peyghoom_BackEnd.Options;
-using Peyghoom_BackEnd.Services.Types;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
@@ -21,7 +19,7 @@ namespace Peyghoom_BackEnd.Services
 
         }
 
-        public string GenerateToken(List<Claim> claims, string authenticationSchema)
+        public string GenerateToken(List<Claim> claims, DateTime datetime, string authenticationSchema)
         {
             string? secretKey = null;
             string? issuer = null;
@@ -46,7 +44,7 @@ namespace Peyghoom_BackEnd.Services
             var jwtSecurityToken = new JwtSecurityToken(
                         issuer: issuer,
                         claims: claims,
-                        expires: DateTime.UtcNow.AddMinutes(10), // Token expiration time
+                        expires: datetime, // Token expiration time
                         signingCredentials: new SigningCredentials(new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey)),
                             SecurityAlgorithms.HmacSha256)
                         );
@@ -60,17 +58,6 @@ namespace Peyghoom_BackEnd.Services
             }
 
             return accessToken;
-        }
-
-        public Task GetVerifyJwtAndGetClaimsAsync(string token)
-        {
-            // Now decode or validate the token
-            var handler = new JwtSecurityTokenHandler();
-
-            var jwtToken = handler.ReadJwtToken(token);
-
-            var claims = jwtToken.Claims.ToDictionary(c => c.Type, c => c.Value);
-            throw new NotImplementedException();
         }
     }
 }

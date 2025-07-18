@@ -5,12 +5,10 @@ namespace Peyghoom_BackEnd.AAA
     public class ClaimRequirement : IAuthorizationRequirement
     {
         public string ClaimType { get; }
-        public string RequiredValue { get; }
 
-        public ClaimRequirement(string claimType, string requiredValue = "true")
+        public ClaimRequirement(string claimType)
         {
             ClaimType = claimType;
-            RequiredValue = requiredValue;
         }
     }
 }

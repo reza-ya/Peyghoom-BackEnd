@@ -7,6 +7,12 @@ namespace Peyghoom_BackEnd.Entities
         [BsonElement("username")]
         public required string Username { get; set; }
         [BsonElement("password")]
-        public required string Password { get; set; }
+        public string Password { get; set; }
+        [BsonElement("phone-number")]
+        public required long PhoneNumber { get; set; }
+        [BsonElement("first-name")]
+        public required string FirstName { get; set; }
+        [BsonElement("last-name")]
+        public required string LastName { get; set; }
     }
 }

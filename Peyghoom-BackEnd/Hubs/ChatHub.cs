@@ -1,10 +1,13 @@
-﻿using Microsoft.AspNetCore.SignalR;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.SignalR;
+using Peyghoom_BackEnd.AAA;
 using Peyghoom_BackEnd.Constants;
 using Peyghoom_BackEnd.Infrastructures.Repositories;
 
 namespace Peyghoom_BackEnd.Hubs
 {
 
+    [Authorize(MyAuthorizationPolicy.RegisteredPolicy)]
     public class ChatHub : Hub
     {
         private IUserRepository _userRepository;
@@ -26,7 +29,7 @@ namespace Peyghoom_BackEnd.Hubs
         public override async Task OnConnectedAsync()
         {
             var connectionId = Context.ConnectionId;
-            var test = _userRepository.GetAllUsers();
+            var test = _userRepository.GetAllUsersAsync();
             var username = Context?.User?.Claims.FirstOrDefault(c => c.Type == "user")?.Value;
             var onlineUser = _onlineUsers.FirstOrDefault(User => User.UserName == username);
             if (onlineUser != null)

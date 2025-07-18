@@ -7,11 +7,11 @@ namespace Peyghoom_BackEnd.AAA
     {
         protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, ClaimRequirement requirement)
         {
-            var hasClaim = context.User.HasClaim(c => c.Type == requirement.ClaimType && c.Value == requirement.RequiredValue);
+            var hasClaim = context.User.HasClaim(c => c.Type == requirement.ClaimType);
 
-            context.Succeed(requirement);
             if (hasClaim)
             {
+                context.Succeed(requirement);
             }
 
             return Task.CompletedTask;

@@ -1,4 +1,4 @@
-﻿namespace Peyghoom_BackEnd.Contracts.types.VerificationCode
+﻿namespace Peyghoom_BackEnd.Contracts.types
 {
     public class VerificationCodeRequest
     {

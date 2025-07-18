@@ -4,6 +4,8 @@ namespace Peyghoom_BackEnd.Infrastructures.Repositories
 {
     public interface IUserRepository
     {
-        Task<List<Users>> GetAllUsers();
+        Task<List<Users>> GetAllUsersAsync();
+        Task<string> InsertUserAsync(Users user);
+        Task<bool> DoesUserExistAsync(Users user);
     }
 }

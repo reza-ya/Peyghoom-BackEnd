@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.IdentityModel.Tokens;
 using Peyghoom_BackEnd.AAA;
 using Peyghoom_BackEnd.Exceptions;
@@ -38,9 +39,9 @@ namespace Peyghoom_BackEnd
 
         public static WebApplicationBuilder AddAuthenticationAndAuthentication(this WebApplicationBuilder builder)
         {
-            var mainAuthSchemaOptions = builder.Configuration.GetSection(MainAuthSchemaOptions.MainAuthSchema).Get<MainAuthSchemaOptions>();
+            var jwtOptions = builder.Configuration.GetSection(JwtOptions.Jwt).Get<JwtOptions>();
 
-            if (mainAuthSchemaOptions == null || mainAuthSchemaOptions.SecretKey == null || mainAuthSchemaOptions.Issuer == null)
+            if (jwtOptions == null || jwtOptions.AccessTokenSecretKey == null || jwtOptions.Issuer == null)
             {
                 // TODO: log and throw exception
                 throw new Exception();
@@ -52,46 +53,34 @@ namespace Peyghoom_BackEnd
                             options.TokenValidationParameters = new TokenValidationParameters
                             {
                                 ValidateIssuer = true,
-                                ValidIssuer = mainAuthSchemaOptions.Issuer,
+                                ValidIssuer = jwtOptions.Issuer,
                                 ValidateAudience = false,
                                 IssuerSigningKey = new SymmetricSecurityKey(
-                                    Encoding.UTF8.GetBytes(mainAuthSchemaOptions.SecretKey))
+                                    Encoding.UTF8.GetBytes(jwtOptions.AccessTokenSecretKey))
                             };
                         });
-            //.AddJwtBearer(VerifyAuthSchemaOptions.VerifyAuthSchema, options =>
-            //{
-            //    options.TokenValidationParameters = new TokenValidationParameters
-            //    {
-            //        ValidateIssuer = true,
-            //        ValidIssuer = verifyAuthSchemaOptions.Issuer,
-            //        ValidateAudience = false,
-            //        IssuerSigningKey = new SymmetricSecurityKey(
-            //            Encoding.UTF8.GetBytes(verifyAuthSchemaOptions.SecretKey))
-            //    };
-            //});
 
 
 
             builder.Services.AddAuthorization(options =>
             {
-                options.AddPolicy(AuthorizationPolicy.PhoneNumberPolicy, policy =>
+                options.AddPolicy(MyAuthorizationPolicy.PhoneNumberPolicy, policy =>
                 {
-                    policy.Requirements.Add(new ClaimRequirement(ClaimTypes.PhoneNumber));
-                    //policy.AddAuthenticationSchemes(JwtBearerDefaults.AuthenticationScheme).RequireAuthenticatedUser();
+                    policy.Requirements.Add(new ClaimRequirement(MyClaimTypes.PhoneNumber));
                 });
 
-                options.AddPolicy(AuthorizationPolicy.PhoneVerifiedPolicy, policy =>
+                options.AddPolicy(MyAuthorizationPolicy.PhoneVerifiedPolicy, policy =>
                 {
-                    policy.Requirements.Add(new ClaimRequirement(ClaimTypes.PhoneVerified));
-                    //policy.AddAuthenticationSchemes(JwtBearerDefaults.AuthenticationScheme).RequireAuthenticatedUser();
+                    policy.Requirements.Add(new ClaimRequirement(MyClaimTypes.PhoneVerified));
                 });
 
-                options.AddPolicy(AuthorizationPolicy.RegisteredPolicy, policy =>
+                options.AddPolicy(MyAuthorizationPolicy.RegisteredPolicy, policy =>
                 {
-                    policy.Requirements.Add(new ClaimRequirement(ClaimTypes.UserRegisterd));
-                    policy.AddAuthenticationSchemes(JwtBearerDefaults.AuthenticationScheme).RequireAuthenticatedUser();
+                    policy.Requirements.Add(new ClaimRequirement(MyClaimTypes.UserRegisterd));
                 });
             });
+
+            builder.Services.AddSingleton<IAuthorizationHandler, ClaimRequirementHandler>();
 
             return builder;
         }
@@ -100,7 +89,7 @@ namespace Peyghoom_BackEnd
         public static WebApplicationBuilder AddOptions(this WebApplicationBuilder builder)
         {
             builder.Services.Configure<VerifyAuthSchemaOptions>(builder.Configuration.GetSection(VerifyAuthSchemaOptions.VerifyAuthSchema));
-            builder.Services.Configure<MainAuthSchemaOptions>(builder.Configuration.GetSection(MainAuthSchemaOptions.MainAuthSchema));
+            builder.Services.Configure<JwtOptions>(builder.Configuration.GetSection(JwtOptions.Jwt));
             builder.Services.Configure<PeyghoomContextOptions>(builder.Configuration.GetSection(PeyghoomContextOptions.PeyghoomContext));
             return builder;
         }

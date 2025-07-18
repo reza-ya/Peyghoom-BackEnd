@@ -31,12 +31,12 @@ namespace Peyghoom_BackEnd.Infrastructures.Repositories
             }
         }
 
-        public async Task<bool> DoesUserExistAsync(Users user)
+        public async Task<bool> DoesUserExistAsync(Users userToCheck)
         {
             var database = _context.GetRPeyghoomDatabase();
             try
             {
-                var findedUser = await database.GetCollection<Users>("users").Find(user => user.PhoneNumber == user.PhoneNumber).FirstOrDefaultAsync();
+                var findedUser = await database.GetCollection<Users>("users").Find(user => user.PhoneNumber == userToCheck.PhoneNumber).FirstOrDefaultAsync();
                 if (findedUser == null)
                 {
                     return false;

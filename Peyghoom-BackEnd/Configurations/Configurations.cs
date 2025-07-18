@@ -1,5 +1,6 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.IdentityModel.Tokens;
+﻿using Microsoft.IdentityModel.Tokens;
+using Peyghoom_BackEnd.AAA;
+using Peyghoom_BackEnd.Exceptions;
 using Peyghoom_BackEnd.Infrastructures;
 using Peyghoom_BackEnd.Infrastructures.Repositories;
 using Peyghoom_BackEnd.Options;
@@ -16,6 +17,7 @@ namespace Peyghoom_BackEnd
             builder.AddAuthenticationAndAuthentication();
             builder.AddOptions();
             builder.Services.AddSignalR();
+            builder.Services.AddExceptionHandler<CustomExceptionHandler>();
             return builder;
         }
 
@@ -44,8 +46,8 @@ namespace Peyghoom_BackEnd
                 throw new Exception();
             }
 
-            builder.Services.AddAuthentication()
-                        .AddJwtBearer(MainAuthSchemaOptions.MainAuthSchema, options =>
+            builder.Services.AddAuthentication("Bearer")
+                        .AddJwtBearer("Bearer", options =>
                         {
                             options.TokenValidationParameters = new TokenValidationParameters
                             {
@@ -55,32 +57,40 @@ namespace Peyghoom_BackEnd
                                 IssuerSigningKey = new SymmetricSecurityKey(
                                     Encoding.UTF8.GetBytes(mainAuthSchemaOptions.SecretKey))
                             };
-                        })
-                        .AddJwtBearer(VerifyAuthSchemaOptions.VerifyAuthSchema, options =>
-                        {
-                            options.TokenValidationParameters = new TokenValidationParameters
-                            {
-                                ValidateIssuer = true,
-                                ValidIssuer = verifyAuthSchemaOptions.Issuer,
-                                ValidateAudience = false,
-                                IssuerSigningKey = new SymmetricSecurityKey(
-                                    Encoding.UTF8.GetBytes(verifyAuthSchemaOptions.SecretKey))
-                            };
                         });
+            //.AddJwtBearer(VerifyAuthSchemaOptions.VerifyAuthSchema, options =>
+            //{
+            //    options.TokenValidationParameters = new TokenValidationParameters
+            //    {
+            //        ValidateIssuer = true,
+            //        ValidIssuer = verifyAuthSchemaOptions.Issuer,
+            //        ValidateAudience = false,
+            //        IssuerSigningKey = new SymmetricSecurityKey(
+            //            Encoding.UTF8.GetBytes(verifyAuthSchemaOptions.SecretKey))
+            //    };
+            //});
 
 
 
             builder.Services.AddAuthorization(options =>
             {
-                options.AddPolicy(AuthorizationPolicy.MainPolicy, policy =>
+                options.AddPolicy(AuthorizationPolicy.PhoneNumberPolicy, policy =>
                 {
-                    policy.RequireAuthenticatedUser().AddAuthenticationSchemes(MainAuthSchemaOptions.MainAuthSchema);
+                    policy.Requirements.Add(new ClaimRequirement(ClaimTypes.PhoneNumber));
+                    //policy.AddAuthenticationSchemes("Bearer").RequireAuthenticatedUser();
                 });
 
-                options.AddPolicy(AuthorizationPolicy.VerifyPolicy, policy =>
-                {
-                    policy.RequireAuthenticatedUser().AddAuthenticationSchemes(VerifyAuthSchemaOptions.VerifyAuthSchema);
-                });
+                //options.AddPolicy(AuthorizationPolicy.PhoneVerifiedPolicy, policy =>
+                //{
+                //    policy.Requirements.Add(new ClaimRequirement(ClaimTypes.PhoneVerified));
+                //    policy.RequireAuthenticatedUser().AddAuthenticationSchemes(MainAuthSchemaOptions.MainAuthSchema);
+                //});
+
+                //options.AddPolicy(AuthorizationPolicy.RegisteredPolicy, policy =>
+                //{
+                //    policy.Requirements.Add(new ClaimRequirement(ClaimTypes.UserRegisterd));
+                //    policy.RequireAuthenticatedUser().AddAuthenticationSchemes(MainAuthSchemaOptions.MainAuthSchema);
+                //});
             });
 
             return builder;

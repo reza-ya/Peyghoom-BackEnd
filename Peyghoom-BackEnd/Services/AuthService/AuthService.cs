@@ -24,16 +24,16 @@ namespace Peyghoom_BackEnd.Services
             string? secretKey = null;
             string? issuer = null;
 
-            if (authenticationSchema == VerifyAuthSchemaOptions.VerifyAuthSchema)
-            {
-                secretKey = _verifyAuthSchemaOptions.SecretKey;
-                issuer = _verifyAuthSchemaOptions.Issuer;
-            }
-            else if (authenticationSchema == MainAuthSchemaOptions.MainAuthSchema)
-            {
-                secretKey = _mainAuthSchemaOptions.SecretKey;
-                issuer = _mainAuthSchemaOptions.Issuer;
-            }
+            secretKey = _mainAuthSchemaOptions.SecretKey;
+            issuer = _mainAuthSchemaOptions.Issuer;
+            //if (authenticationSchema == VerifyAuthSchemaOptions.VerifyAuthSchema)
+            //{
+            //    secretKey = _verifyAuthSchemaOptions.SecretKey;
+            //    issuer = _verifyAuthSchemaOptions.Issuer;
+            //}
+            //else if (authenticationSchema == MainAuthSchemaOptions.MainAuthSchema)
+            //{
+            //}
 
             if (secretKey == null || issuer == null)
             {

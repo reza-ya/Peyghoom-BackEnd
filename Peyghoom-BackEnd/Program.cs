@@ -21,6 +21,7 @@ namespace Peyghoom_BackEnd
             if (app.Environment.IsDevelopment())
             {
                 app.MapOpenApi();
+                app.UseExceptionHandler("/Error");
             }
 
             app.UseHttpsRedirection();

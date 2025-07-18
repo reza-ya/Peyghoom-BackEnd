@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
+using Peyghoom_BackEnd.AAA;
 using Peyghoom_BackEnd.Constants;
 using Peyghoom_BackEnd.Contracts.types;
 using Peyghoom_BackEnd.Contracts.types.VerificationCode;
@@ -19,7 +20,7 @@ namespace Peyghoom_BackEnd.Endpoints
             group.MapPost("/verification-code", VerificationCode);
 
             group.MapPost("/verify", Verify)
-                    .RequireAuthorization(AuthorizationPolicy.VerifyPolicy);
+                    .RequireAuthorization(AuthorizationPolicy.PhoneNumberPolicy);
 
             return app;
         }   
@@ -31,7 +32,7 @@ namespace Peyghoom_BackEnd.Endpoints
         {
             oTPService.SendCode(verificationCodeRequest.PhoneNumber, verificationCodeRequest.CountryCode);
 
-            var token = authService.GenerateToken(new List<Claim>() { new Claim(ClaimKey.PhoneNumber, verificationCodeRequest.PhoneNumber.ToString())}, DateTime.UtcNow.AddMinutes(3), VerifyAuthSchemaOptions.VerifyAuthSchema);
+            var token = authService.GenerateToken(new List<Claim>() { new Claim(ClaimKey.PhoneNumber, verificationCodeRequest.PhoneNumber.ToString())}, DateTime.UtcNow.AddMinutes(120), MainAuthSchemaOptions.MainAuthSchema);
 
             return Results.Ok(new { token });
         }

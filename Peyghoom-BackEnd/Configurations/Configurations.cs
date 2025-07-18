@@ -1,4 +1,5 @@
-﻿using Microsoft.IdentityModel.Tokens;
+﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
 using Peyghoom_BackEnd.AAA;
 using Peyghoom_BackEnd.Exceptions;
 using Peyghoom_BackEnd.Infrastructures;
@@ -38,16 +39,15 @@ namespace Peyghoom_BackEnd
         public static WebApplicationBuilder AddAuthenticationAndAuthentication(this WebApplicationBuilder builder)
         {
             var mainAuthSchemaOptions = builder.Configuration.GetSection(MainAuthSchemaOptions.MainAuthSchema).Get<MainAuthSchemaOptions>();
-            var verifyAuthSchemaOptions = builder.Configuration.GetSection(VerifyAuthSchemaOptions.VerifyAuthSchema).Get<VerifyAuthSchemaOptions>();
 
-            if (mainAuthSchemaOptions == null || verifyAuthSchemaOptions == null || mainAuthSchemaOptions.SecretKey == null || mainAuthSchemaOptions.Issuer == null || verifyAuthSchemaOptions.SecretKey == null || verifyAuthSchemaOptions.Issuer == null)
+            if (mainAuthSchemaOptions == null || mainAuthSchemaOptions.SecretKey == null || mainAuthSchemaOptions.Issuer == null)
             {
                 // TODO: log and throw exception
                 throw new Exception();
             }
 
-            builder.Services.AddAuthentication("Bearer")
-                        .AddJwtBearer("Bearer", options =>
+            builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+                        .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, options =>
                         {
                             options.TokenValidationParameters = new TokenValidationParameters
                             {
@@ -77,20 +77,20 @@ namespace Peyghoom_BackEnd
                 options.AddPolicy(AuthorizationPolicy.PhoneNumberPolicy, policy =>
                 {
                     policy.Requirements.Add(new ClaimRequirement(ClaimTypes.PhoneNumber));
-                    //policy.AddAuthenticationSchemes("Bearer").RequireAuthenticatedUser();
+                    //policy.AddAuthenticationSchemes(JwtBearerDefaults.AuthenticationScheme).RequireAuthenticatedUser();
                 });
 
-                //options.AddPolicy(AuthorizationPolicy.PhoneVerifiedPolicy, policy =>
-                //{
-                //    policy.Requirements.Add(new ClaimRequirement(ClaimTypes.PhoneVerified));
-                //    policy.RequireAuthenticatedUser().AddAuthenticationSchemes(MainAuthSchemaOptions.MainAuthSchema);
-                //});
+                options.AddPolicy(AuthorizationPolicy.PhoneVerifiedPolicy, policy =>
+                {
+                    policy.Requirements.Add(new ClaimRequirement(ClaimTypes.PhoneVerified));
+                    //policy.AddAuthenticationSchemes(JwtBearerDefaults.AuthenticationScheme).RequireAuthenticatedUser();
+                });
 
-                //options.AddPolicy(AuthorizationPolicy.RegisteredPolicy, policy =>
-                //{
-                //    policy.Requirements.Add(new ClaimRequirement(ClaimTypes.UserRegisterd));
-                //    policy.RequireAuthenticatedUser().AddAuthenticationSchemes(MainAuthSchemaOptions.MainAuthSchema);
-                //});
+                options.AddPolicy(AuthorizationPolicy.RegisteredPolicy, policy =>
+                {
+                    policy.Requirements.Add(new ClaimRequirement(ClaimTypes.UserRegisterd));
+                    policy.AddAuthenticationSchemes(JwtBearerDefaults.AuthenticationScheme).RequireAuthenticatedUser();
+                });
             });
 
             return builder;

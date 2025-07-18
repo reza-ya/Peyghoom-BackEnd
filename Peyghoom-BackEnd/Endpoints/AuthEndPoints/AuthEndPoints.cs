@@ -32,7 +32,7 @@ namespace Peyghoom_BackEnd.Endpoints
         {
             oTPService.SendCode(verificationCodeRequest.PhoneNumber, verificationCodeRequest.CountryCode);
 
-            var token = authService.GenerateToken(new List<Claim>() { new Claim(ClaimKey.PhoneNumber, verificationCodeRequest.PhoneNumber.ToString())}, DateTime.UtcNow.AddMinutes(120), MainAuthSchemaOptions.MainAuthSchema);
+            var token = authService.GenerateToken(new List<Claim>() { new Claim(ClaimKey.PhoneNumber, "true") }, DateTime.UtcNow.AddMinutes(120), MainAuthSchemaOptions.MainAuthSchema);
 
             return Results.Ok(new { token });
         }

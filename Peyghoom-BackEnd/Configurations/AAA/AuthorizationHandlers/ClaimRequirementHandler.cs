@@ -9,7 +9,7 @@ namespace Peyghoom_BackEnd.AAA
         {
             var hasClaim = context.User.HasClaim(c => c.Type == requirement.ClaimType && c.Value == requirement.RequiredValue);
 
-                context.Succeed(requirement);
+            context.Succeed(requirement);
             if (hasClaim)
             {
             }

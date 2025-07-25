@@ -69,12 +69,15 @@ namespace Peyghoom_BackEnd.Endpoints
             }
 
             var users = await userRepository.GetAllUsersAsync();
-
-            if (users.Any(user => user.PhoneNumber == phoneNumber))
+            var user = users.FirstOrDefault(user => user.PhoneNumber == phoneNumber);
+            if (user != null)
             {
                 var jwtTokens = authService.GenerateTokenRefreshToken(
-                                            new List<Claim>() { new Claim(MyClaimTypes.UserRegisterd , "true") }, 
-                                            DateTime.UtcNow.AddHours(1)
+                                            new List<Claim>() {
+                                                new Claim(MyClaimTypes.UserRegisterd , "true"),
+                                                new Claim(MyClaimTypes.SubId, user.Username)
+                                            }, 
+                                            DateTime.UtcNow.AddHours(10)
                                             ,DateTime.UtcNow.AddDays(15));
 
                 return Results.Ok(new VerifyResponse { AccessToken = jwtTokens.AccessToken, RefreshToken = jwtTokens.RefreshToken });

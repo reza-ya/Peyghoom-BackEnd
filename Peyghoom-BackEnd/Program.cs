@@ -29,7 +29,7 @@ namespace Peyghoom_BackEnd
             app.UseAuthentication();
             app.UseAuthorization();
 
-
+            app.UseCors("cors");
 
             app.MapAllEndpoints();
             app.MapHub<ChatHub>("/chatHub");

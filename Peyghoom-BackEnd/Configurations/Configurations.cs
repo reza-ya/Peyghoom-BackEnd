@@ -20,6 +20,18 @@ namespace Peyghoom_BackEnd
             builder.AddOptions();
             builder.Services.AddSignalR();
             builder.Services.AddExceptionHandler<CustomExceptionHandler>();
+            builder.Services.AddCors(options =>
+            {
+                options.AddPolicy(name: "cors",
+                                  policy =>
+                                  {
+                                      policy.WithOrigins("https://localhost:3000");
+                                      policy.AllowAnyHeader();
+                                      policy.AllowAnyMethod();
+                                      policy.SetIsOriginAllowed((host) => true); // Allow any origin for development
+                                      policy.AllowCredentials();
+                                  });
+            });
             return builder;
         }
 
@@ -57,6 +69,23 @@ namespace Peyghoom_BackEnd
                                 ValidateAudience = false,
                                 IssuerSigningKey = new SymmetricSecurityKey(
                                     Encoding.UTF8.GetBytes(jwtOptions.AccessTokenSecretKey))
+                            };
+                            options.Events = new JwtBearerEvents
+                            {
+                                OnMessageReceived = context =>
+                                {
+                                    var accessToken = context.Request.Query["access_token"];
+
+                                    // If the request is for our hub...
+                                    var path = context.HttpContext.Request.Path;
+                                    if (!string.IsNullOrEmpty(accessToken) &&
+                                        (path.StartsWithSegments("/chatHub")))
+                                    {
+                                        // Read the token out of the query string
+                                        context.Token = accessToken;
+                                    }
+                                    return Task.CompletedTask;
+                                }
                             };
                         });
 

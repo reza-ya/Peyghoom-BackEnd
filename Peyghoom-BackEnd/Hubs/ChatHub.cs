@@ -7,7 +7,9 @@ using Peyghoom_BackEnd.Infrastructures.Repositories;
 namespace Peyghoom_BackEnd.Hubs
 {
 
+    // TODO: authorize by policy
     [Authorize(MyAuthorizationPolicy.RegisteredPolicy)]
+    //[Authorize]
     public class ChatHub : Hub
     {
         private IUserRepository _userRepository;
@@ -30,7 +32,7 @@ namespace Peyghoom_BackEnd.Hubs
         {
             var connectionId = Context.ConnectionId;
             var test = _userRepository.GetAllUsersAsync();
-            var username = Context?.User?.Claims.FirstOrDefault(c => c.Type == "user")?.Value;
+            var username = Context?.User?.Claims.FirstOrDefault(c => c.Type == MyClaimTypes.SubId)?.Value;
             var onlineUser = _onlineUsers.FirstOrDefault(User => User.UserName == username);
             if (onlineUser != null)
             {
@@ -50,7 +52,7 @@ namespace Peyghoom_BackEnd.Hubs
         public override async Task OnDisconnectedAsync(Exception? exception)
         {
             var connectionId = Context.ConnectionId;
-            var username = Context?.User?.Claims.FirstOrDefault(c => c.Type == "user")?.Value;
+            var username = Context?.User?.Claims.FirstOrDefault(c => c.Type == MyClaimTypes.SubId)?.Value;
 
             var onlineUser = _onlineUsers.RemoveAll(User => User.UserName == username);
 

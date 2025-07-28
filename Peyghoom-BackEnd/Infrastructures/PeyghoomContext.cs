@@ -25,7 +25,6 @@ namespace Peyghoom_BackEnd.Infrastructures
 
             var client = new MongoClient(connectionString);
 
-
             var database = client.GetDatabase("rpeyghoom");
 
             return database;

@@ -20,8 +20,8 @@ namespace Peyghoom_BackEnd.Endpoints
 
             group.MapPost("/verification-code", VerificationCode);
 
-            group.MapPost("/verification-code/verify", Verify)
-                    .RequireAuthorization(MyAuthorizationPolicy.PhoneNumberPolicy);
+            group.MapPost("/verification-code/verify", Verify);
+                    //.RequireAuthorization(MyAuthorizationPolicy.PhoneNumberPolicy);
 
             group.MapPost("/refresh", Refresh);
 
@@ -75,7 +75,8 @@ namespace Peyghoom_BackEnd.Endpoints
                 var jwtTokens = authService.GenerateTokenRefreshToken(
                                             new List<Claim>() {
                                                 new Claim(MyClaimTypes.UserRegisterd , "true"),
-                                                new Claim(MyClaimTypes.SubId, user.Username)
+                                                new Claim(MyClaimTypes.UserName, user.Username),
+                                                new Claim(MyClaimTypes.SubId, user.Id.ToString())
                                             }, 
                                             DateTime.UtcNow.AddHours(10)
                                             ,DateTime.UtcNow.AddDays(15));
@@ -127,7 +128,7 @@ namespace Peyghoom_BackEnd.Endpoints
                             new List<Claim>() 
                             {
                                 new Claim(MyClaimTypes.UserRegisterd, "true"),
-                                new Claim(MyClaimTypes.SubId, UserId)
+                                new Claim(MyClaimTypes.UserName, UserId)
                             },
                             DateTime.UtcNow.AddHours(1)
                             , DateTime.UtcNow.AddDays(15));

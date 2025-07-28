@@ -18,12 +18,16 @@ namespace Peyghoom_BackEnd.Entities
         [BsonElement("chats")]
         public List<Chats> Chats { get; set; }
 
-}
+    }
 
     public class Chats
     {
+        public Chats()
+        {
+            CreateAt = DateTime.Now;
+        }
         [BsonRepresentation(BsonType.ObjectId)]
-        public required string UserId { get; set; }
+        public required ObjectId UserId { get; set; }
         [BsonElement("created_at")]
         public required DateTime CreateAt { get; set; }
         [BsonElement("messages")]
@@ -33,10 +37,18 @@ namespace Peyghoom_BackEnd.Entities
 
     public class Messages
     {
-        [BsonElement("receiver_id")]
-        public required string ReceiverId { get; set; }
-        [BsonElement("recipient_id")]
-        public required string RecipientId { get; set; }
+        public Messages()
+        {
+            CreateAt = DateTime.Now;
+        }
+        [BsonElement("created_at")]
+        public required DateTime CreateAt { get; set; }
+        //[BsonElement("receiver_username")]
+        [BsonRepresentation(BsonType.ObjectId)]
+        public required ObjectId ReceiverUserId { get; set; }
+        //[BsonElement("recipient_username")]
+        [BsonRepresentation(BsonType.ObjectId)]
+        public required ObjectId SenderUserId { get; set; }
         [BsonElement("text")]
         public required string Text { get; set; }
         [BsonElement("received")]

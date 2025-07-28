@@ -69,5 +69,35 @@ namespace Peyghoom_BackEnd.Infrastructures.Repositories
             }
         }
 
+
+        public async Task<List<Messages>> OpenChatAsync(string userId, string username)
+        {
+            var messages = new List<Messages>();
+            var database = _context.GetRPeyghoomDatabase();
+            
+            var findedUser = await database.GetCollection<Users>("users").Find(u => u.Id == new ObjectId(userId)).FirstOrDefaultAsync();
+            var requestedUser = await database.GetCollection<Users>("users").Find(u => u.Username == username).FirstOrDefaultAsync();
+            if (findedUser.Chats != null)
+            {
+                var chat = findedUser.Chats.Where(chat => chat.UserId == requestedUser.Id).FirstOrDefault();
+                if (chat != null)
+                {
+                    var findedMessage = chat.Messages.OrderByDescending(m => m.CreateAt).Take(10).ToList();
+                    messages.AddRange(findedMessage);
+                }
+            }
+            else
+            {
+                var newChat = new Chats() { CreateAt = DateTime.Now, Messages = new List<Messages>(), UserId = requestedUser.Id };
+
+                var update = Builders<Users>.Update.Push(u => u.Chats, newChat);
+                var result =  database.GetCollection<Users>("users").UpdateOneAsync(
+                    u => u.Id == ObjectId.Parse(userId),
+                    update
+                );
+            }
+            return messages;
+
+        }
     }
 }

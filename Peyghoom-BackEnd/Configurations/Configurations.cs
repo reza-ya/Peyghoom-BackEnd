@@ -43,6 +43,7 @@ namespace Peyghoom_BackEnd
             builder.Services.AddSingleton<IOTPService, OTPService>();
             builder.Services.AddScoped<IPeyghoomContext, PeyghoomContext>();
             builder.Services.AddScoped<IUserRepository, UserRepository>();
+            builder.Services.AddScoped<IChatRepository, ChatRepository>();
 
             builder.Services.AddMemoryCache();
             return builder;

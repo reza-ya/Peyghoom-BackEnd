@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.SignalR;
 using Peyghoom_BackEnd.AAA;
 using Peyghoom_BackEnd.Constants;
@@ -13,18 +14,34 @@ namespace Peyghoom_BackEnd.Hubs
     public class ChatHub : Hub
     {
         private IUserRepository _userRepository;
+        private IChatRepository _chatRepository;
         private static List<OnlineUser> _onlineUsers = new List<OnlineUser>();
 
 
-        public ChatHub(IUserRepository userRepository)
+        public ChatHub(IUserRepository userRepository, IChatRepository chatRepository)
         {
             _userRepository = userRepository;
+            _chatRepository = chatRepository;
         }
         public async Task SendMessage(string message, string username)
         {
+            var user = Context?.User?.Claims.FirstOrDefault(claim => claim.Type == MyClaimTypes.UserName)?.Value;
+            var userId = Context?.User?.Claims.FirstOrDefault(claim => claim.Type == MyClaimTypes.SubId)?.Value;
+
+            if (user == null || userId == null)
+            {
+                //TODO: 
+                throw new Exception();
+            }
+
+
             var onlineUser = _onlineUsers.FirstOrDefault(User => User.UserName == username);
-            var chosenClient = Clients.Client(onlineUser.ConnectionId);
-            await chosenClient.SendAsync(HubEvents.ReceiveMessage, message);
+            await _chatRepository.SendMessageAsync(userId, username, "Hello");
+            if (onlineUser != null)
+            {
+                var chosenClient = Clients.Client(onlineUser.ConnectionId);
+                await chosenClient.SendAsync(HubEvents.ReceiveMessage, message);
+            }
         }
 
 
@@ -32,7 +49,7 @@ namespace Peyghoom_BackEnd.Hubs
         {
             var connectionId = Context.ConnectionId;
             var test = _userRepository.GetAllUsersAsync();
-            var username = Context?.User?.Claims.FirstOrDefault(c => c.Type == MyClaimTypes.SubId)?.Value;
+            var username = Context?.User?.Claims.FirstOrDefault(c => c.Type == MyClaimTypes.UserName)?.Value;
             var onlineUser = _onlineUsers.FirstOrDefault(User => User.UserName == username);
             if (onlineUser != null)
             {
@@ -52,7 +69,7 @@ namespace Peyghoom_BackEnd.Hubs
         public override async Task OnDisconnectedAsync(Exception? exception)
         {
             var connectionId = Context.ConnectionId;
-            var username = Context?.User?.Claims.FirstOrDefault(c => c.Type == MyClaimTypes.SubId)?.Value;
+            var username = Context?.User?.Claims.FirstOrDefault(c => c.Type == MyClaimTypes.UserName)?.Value;
 
             var onlineUser = _onlineUsers.RemoveAll(User => User.UserName == username);
 

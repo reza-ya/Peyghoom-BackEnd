@@ -4,9 +4,9 @@ using Microsoft.AspNetCore.SignalR;
 
 namespace Peyghoom_BackEnd.AAA
 {
-    public class ClaimRequirementHandler : AuthorizationHandler<ClaimRequirement, HubInvocationContext>
+    public class ClaimRequirementHandler : AuthorizationHandler<ClaimRequirement>
     {
-        protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, ClaimRequirement requirement, HubInvocationContext resource)
+        protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, ClaimRequirement requirement)
         {
             // TODO: authorize by policy for Hub
             if (context.User?.Identity?.IsAuthenticated != true)

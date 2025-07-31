@@ -26,10 +26,11 @@ namespace Peyghoom_BackEnd
 
             app.UseHttpsRedirection();
 
+            app.UseCors("cors");
+
             app.UseAuthentication();
             app.UseAuthorization();
 
-            app.UseCors("cors");
 
             app.MapAllEndpoints();
             app.MapHub<ChatHub>("/chatHub");

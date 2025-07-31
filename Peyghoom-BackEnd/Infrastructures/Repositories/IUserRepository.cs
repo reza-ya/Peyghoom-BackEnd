@@ -1,4 +1,5 @@
-﻿using Peyghoom_BackEnd.Entities;
+﻿using Peyghoom_BackEnd.Contracts.types;
+using Peyghoom_BackEnd.Entities;
 
 namespace Peyghoom_BackEnd.Infrastructures.Repositories
 {
@@ -7,6 +8,6 @@ namespace Peyghoom_BackEnd.Infrastructures.Repositories
         Task<List<Users>> GetAllUsersAsync();
         Task<string> InsertUserAsync(Users user);
         Task<bool> DoesUserExistAsync(Users user);
-        Task<List<Messages>> OpenChatAsync(string user, string username);
+        Task<OpenChatResponse> OpenChatAsync(string user, string username);
     }
 }

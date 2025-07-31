@@ -34,8 +34,8 @@ namespace Peyghoom_BackEnd.Endpoints
                 throw new Exception();
             }
 
-            var messages = await userRepository.OpenChatAsync(userId, openChatRequest.UserName);
-            return Results.Ok(messages);
+            var openChatResponse = await userRepository.OpenChatAsync(userId, openChatRequest.UserName);
+            return Results.Ok(openChatResponse);
         }
 
 

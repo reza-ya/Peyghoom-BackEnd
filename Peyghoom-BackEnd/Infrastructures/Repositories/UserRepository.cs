@@ -1,6 +1,7 @@
 ﻿using MongoDB.Bson;
 using MongoDB.Driver;
 using Peyghoom_BackEnd.Entities;
+using Peyghoom_BackEnd.Contracts.types;
 
 namespace Peyghoom_BackEnd.Infrastructures.Repositories
 {
@@ -70,7 +71,7 @@ namespace Peyghoom_BackEnd.Infrastructures.Repositories
         }
 
 
-        public async Task<List<Messages>> OpenChatAsync(string userId, string username)
+        public async Task<OpenChatResponse> OpenChatAsync(string userId, string username)
         {
             var messages = new List<Messages>();
             var database = _context.GetRPeyghoomDatabase();
@@ -96,7 +97,7 @@ namespace Peyghoom_BackEnd.Infrastructures.Repositories
                     update
                 );
             }
-            return messages;
+            return new OpenChatResponse() { UserId = requestedUser.Id.ToString() , Messages = messages };
 
         }
     }

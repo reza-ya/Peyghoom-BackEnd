@@ -20,8 +20,8 @@ namespace Peyghoom_BackEnd.Endpoints
 
             group.MapPost("/verification-code", VerificationCode);
 
-            group.MapPost("/verification-code/verify", Verify);
-                    //.RequireAuthorization(MyAuthorizationPolicy.PhoneNumberPolicy);
+            group.MapPost("/verification-code/verify", Verify)
+                    .RequireAuthorization(MyAuthorizationPolicy.PhoneNumberPolicy);
 
             group.MapPost("/refresh", Refresh);
 
@@ -60,13 +60,13 @@ namespace Peyghoom_BackEnd.Endpoints
                 throw new Exception();
             }
 
-            var result = oTPService.VerifyCode(phoneNumber, verifyRequest.Code);
+            //var result = oTPService.VerifyCode(phoneNumber, verifyRequest.Code);
 
             
-            if (result.IsFailure)
-            {
-                return Results.StatusCode((int)HttpStatusCode.Gone);
-            }
+            //if (result.IsFailure)
+            //{
+            //    return Results.StatusCode((int)HttpStatusCode.Gone);
+            //}
 
             var users = await userRepository.GetAllUsersAsync();
             var user = users.FirstOrDefault(user => user.PhoneNumber == phoneNumber);

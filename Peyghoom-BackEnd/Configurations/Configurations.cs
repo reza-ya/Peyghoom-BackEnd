@@ -25,7 +25,7 @@ namespace Peyghoom_BackEnd
                 options.AddPolicy(name: "cors",
                                   policy =>
                                   {
-                                      policy.WithOrigins("https://localhost:3000");
+                                      policy.WithOrigins("http://localhost:3000/");
                                       policy.AllowAnyHeader();
                                       policy.AllowAnyMethod();
                                       policy.SetIsOriginAllowed((host) => true); // Allow any origin for development

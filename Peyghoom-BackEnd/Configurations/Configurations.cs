@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.IdentityModel.Tokens;
+using MongoDB.Bson;
 using Peyghoom_BackEnd.AAA;
 using Peyghoom_BackEnd.Exceptions;
 using Peyghoom_BackEnd.Infrastructures;
@@ -57,7 +58,7 @@ namespace Peyghoom_BackEnd
             if (jwtOptions == null || jwtOptions.AccessTokenSecretKey == null || jwtOptions.Issuer == null)
             {
                 // TODO: log and throw exception
-                throw new Exception();
+                throw new Exception($"one of the JwtOptions are empty, reading from location: {JwtOptions.Jwt} from appsettings");
             }
 
             builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)

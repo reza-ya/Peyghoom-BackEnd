@@ -8,9 +8,12 @@ namespace Peyghoom_BackEnd.Infrastructures.Repositories
     public class UserRepository : IUserRepository
     {
         IPeyghoomContext _context;
-        public UserRepository(IPeyghoomContext context)
+        private ILogger _logger;
+
+        public UserRepository(IPeyghoomContext context, ILogger<UserRepository> logger)
         {
             _context = context;
+            _logger = logger;
         }
 
         public async Task<List<Users>> GetAllUsersAsync()
@@ -28,6 +31,8 @@ namespace Peyghoom_BackEnd.Infrastructures.Repositories
             }
             catch (Exception exception)
             {
+                //TODO: error handling
+                _logger.LogError(exception.Message);
                 throw;
             }
         }
@@ -50,6 +55,7 @@ namespace Peyghoom_BackEnd.Infrastructures.Repositories
             }
             catch (Exception exception)
             {
+                _logger.LogError(exception.Message);
                 throw;
             }
         }
@@ -66,6 +72,7 @@ namespace Peyghoom_BackEnd.Infrastructures.Repositories
             }
             catch (Exception exception)
             {
+                _logger.LogError(exception.Message);
                 throw;
             }
         }
